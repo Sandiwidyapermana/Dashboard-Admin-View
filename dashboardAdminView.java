@@ -8,7 +8,28 @@ import javax.swing.ButtonGroup;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
+
+class Filter{
+  static String filter = "semua";
+  static String keyword = "";
+
+  static DefaultTableModel search()
+  {
+    DefaultTableModel tm = new DefaultTableModel();
+
+    if( filter.equalsIgnoreCase("semua") ){
+      // memanggil dan menggantikan tm dengan return dari getSearchAllPaket
+      tm = Model.getSearchAllPaket(keyword);
+    }else if( filter.equalsIgnoreCase("aktif") ){
+      tm = Model.getSearchPaketAktif(keyword);
+    }else if ( filter.equalsIgnoreCase("tidak aktif") ){
+      tm = Model.getSearchPaketNonAktif(keyword);
+    }
+
+    return tm;
+  }
+
+}
 
 public class dashboardAdminView extends cDashboardFrame{
 
@@ -19,8 +40,8 @@ public class dashboardAdminView extends cDashboardFrame{
   private cSidebarMenu menuBeranda = new cSidebarMenu("Beranda", 70);
   private cSidebarMenu menuDataMitra = new cSidebarMenu("Data Mitra", 70+50);
   private cSidebarMenu menuDataCustomer = new cSidebarMenu("Data Customer", 70+50+50);
-  private cSidebarMenu menuDataPaket = new cSidebarMenu("Data Vitamin", 70+50+50+50);
-  private cSidebarMenu menuRequestSaldo = new cSidebarMenu("Request Vitamin", 70+50+50+50+50);
+  private cSidebarMenu menuDataPaket = new cSidebarMenu("Data Telur", 70+50+50+50);
+  private cSidebarMenu menuRequestSaldo = new cSidebarMenu("Request Telur", 70+50+50+50+50);
   private cSidebarMenu menuCalonMitra = new cSidebarMenu("Calon Mitra", 70+50+50+50+50+50);
   private cSidebarMenu menuTransaksiPulsa = new cSidebarMenu("Transaksi Telur", 70+50+50+50+50+50+50);
   private cSidebarMenu menuTransaksiPaket = new cSidebarMenu("Transaksi Vitamin", 70+50+50+50+50+50+50+50);
@@ -60,54 +81,53 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
   private cLabelInfo labelDataPaket = new cLabelInfo("Data Request Request Saldo Pending", 25, 20);
   private cFormLabel labelCariDataPaket = new cFormLabel("Cari", 25, 75, 55, false);
   private cTextField txtCariDataPaket = new cTextField(83, 70, 317, false);
-  private cBlueButton btnTambahDataPaket = new cBlueButton("Tambah Vitamin", 418, 70, 162);
+  private cBlueButton btnTambahDataPaket = new cBlueButton("Tambah Telur", 418, 70, 162);
   private cRadioButton rdSemuaDataPaket = new cRadioButton("Semua", "all", 25, 115, 97);
-  private cRadioButton rdAktifDataPaket = new cRadioButton("Aktif", "active", 132, 115, 72);
-  private cRadioButton rdTidakAktifDataPaket = new cRadioButton("Tidak Aktif", "nonactive", 214, 115, 112);
-  private ButtonGroup groupActionDataPaket = new ButtonGroup();
+  private cRadioButton rdAktifDataPaket = new cRadioButton("Tersedia", "Tidak Tersedia", 132, 115, 72);
+  private cRadioButton rdTidakAktifDataPaket = new cRadioButton("Tidak Tersedia", "Tidak Tersedia", 214, 115, 112);
   private cTable tblDataDataPaket;
   private cScrollPane spDataDataPaket;
-  private cGreenButton btnUbahDataPaket = new cGreenButton("Ubah", 25, 410, 92);
-  private cLabelInfo labelDeskripsiPaketDataPaket = new cLabelInfo("Deskripsi Vitamin", 600, 145);
-  private cTextarea valueDeskripsiPaketDataPaket = new cTextarea(false);
+  private cGreenButton btnUbahDataPaket = new cGreenButton("Update", 25, 410, 92);
+  private cLabelInfo labelDeskripsiPaketDataPaket = new cLabelInfo("Deskripsi Telur", 600, 145);
+  private cTextarea valueDeskripsiPaketDataPaket = new cTextarea("", 600, 186, false);
   
   // TambahDataPaket components
-  private cLabelInfo labelTambahDataPaket = new cLabelInfo("Isi form data paket dengan lengkap", 25, 20);
-  private cFormLabel labelNamaPaketTambahDataPaket = new cFormLabel("Nama Vitamin", 25, 65, 550, false);
+  private cLabelInfo labelTambahDataPaket = new cLabelInfo("Isi form telur dengan lengkap", 25, 20);
+  private cFormLabel labelNamaPaketTambahDataPaket = new cFormLabel("Nama Telur", 25, 65, 550, false);
   private cTextField txtNamaPaketTambahDataPaket = new cTextField(25, 90, 550, false);
-  private cErrorLabel errorNamaPaketTambahDataPaket = new cErrorLabel("nama vitamin tidak boleh kosong!", 25, 125, 550, false);
-  private cFormLabel labelKuotaPaketTambahDataPaket = new cFormLabel("Jumlah Vitamin", 25, 150, 550, false);
+  private cErrorLabel errorNamaPaketTambahDataPaket = new cErrorLabel("nama telur tidak boleh kosong!", 25, 125, 550, false);
+  private cFormLabel labelKuotaPaketTambahDataPaket = new cFormLabel("Jumlah Telur", 25, 150, 550, false);
   private cTextField txtKuotaPaketTambahDataPaket = new cTextField(25, 175, 550, false);
-  private cErrorLabel errorKuotaPaketTambahDataPaket = new cErrorLabel("vitamin tidak boleh kosong!", 25, 210, 550, false);
-  private cFormLabel labelHargaPaketTambahDataPaket = new cFormLabel("Harga Vitamin", 25, 235, 550, false);
+  private cErrorLabel errorKuotaPaketTambahDataPaket = new cErrorLabel("jumlah telur tidak boleh kosong!", 25, 210, 550, false);
+  private cFormLabel labelHargaPaketTambahDataPaket = new cFormLabel("Harga Telur", 25, 235, 550, false);
   private cTextField txtHargaPaketTambahDataPaket = new cTextField(25, 260, 550, false);
-  private cErrorLabel errorHargaPaketTambahDataPaket = new cErrorLabel("harga vitamin tidak boleh kosong!", 25, 295, 550, false);
-  private cCheckBox chAktifTambahDataPaket = new cCheckBox("Aktifkan", "1", 25, 316, 100);
+  private cErrorLabel errorHargaPaketTambahDataPaket = new cErrorLabel("harga telur tidak boleh kosong!", 25, 295, 550, false);
+  private cCheckBox chAktifTambahDataPaket = new cCheckBox("Add", "1", 25, 316, 100);
   private cBlueButton btnTambahPaketTambahDataPaket = new cBlueButton("Tambah", 25, 348, 110);
   private cRedButton btnBatalTambahDataPaket = new cRedButton("Batal", 155, 348, 110);
-  private cFormLabel labelDeskripsiPaketTambahDataPaket = new cFormLabel("Deskripsi Vitamin", 595, 65, 370, false);
+  private cFormLabel labelDeskripsiPaketTambahDataPaket = new cFormLabel("Deskripsi Telur", 595, 65, 370, false);
   private cTextarea txtDeskripsiPaketTambahDataPaket = new cTextarea(true);
   private cScrollPane spTxtDeskripsiPaketTambahDataPaket = new cScrollPane(txtDeskripsiPaketTambahDataPaket, 595, 90, 370, 205);
-  private cErrorLabel errorDeskripsiPaketTambahDataPaket = new cErrorLabel("deskripsi vitamin tidak boleh kosong!", 595, 295, 370, false);
+  private cErrorLabel errorDeskripsiPaketTambahDataPaket = new cErrorLabel("deskripsi telur tidak boleh kosong!", 595, 295, 370, false);
 
   // UbahDataPaket components
-  private cLabelInfo labelUbahDataPaket = new cLabelInfo("Isi form data paket dengan lengkap", 25, 20);
-  private cFormLabel labelNamaPaketUbahDataPaket = new cFormLabel("Nama Vitamin", 25, 65, 550, false);
+  private cLabelInfo labelUbahDataPaket = new cLabelInfo("Isi form data telur dengan lengkap", 25, 20);
+  private cFormLabel labelNamaPaketUbahDataPaket = new cFormLabel("Nama telur", 25, 65, 550, false);
   private cTextField txtNamaPaketUbahDataPaket = new cTextField(25, 90, 550, false);
-  private cErrorLabel errorNamaPaketUbahDataPaket = new cErrorLabel("nama paket tidak boleh kosong!", 25, 125, 550, false);
-  private cFormLabel labelKuotaPaketUbahDataPaket = new cFormLabel("Jumlah Vitamin", 25, 150, 550, false);
+  private cErrorLabel errorNamaPaketUbahDataPaket = new cErrorLabel("nama telur tidak boleh kosong!", 25, 125, 550, false);
+  private cFormLabel labelKuotaPaketUbahDataPaket = new cFormLabel("Jumlah Telur", 25, 150, 550, false);
   private cTextField txtKuotaPaketUbahDataPaket = new cTextField(25, 175, 550, false);
-  private cErrorLabel errorKuotaPaketUbahDataPaket = new cErrorLabel("jumlah vitamin tidak boleh kosong!", 25, 210, 550, false);
-  private cFormLabel labelHargaPaketUbahDataPaket = new cFormLabel("Harga Vitamin", 25, 235, 550, false);
+  private cErrorLabel errorKuotaPaketUbahDataPaket = new cErrorLabel("jumlah telur tidak boleh kosong!", 25, 210, 550, false);
+  private cFormLabel labelHargaPaketUbahDataPaket = new cFormLabel("Harga Telur", 25, 235, 550, false);
   private cTextField txtHargaPaketUbahDataPaket = new cTextField(25, 260, 550, false);
-  private cErrorLabel errorHargaPaketUbahDataPaket = new cErrorLabel("harga vitamin tidak boleh kosong!", 25, 295, 550, false);
-  private cCheckBox chAktifUbahDataPaket = new cCheckBox("Aktifkan", "1", 25, 316, 100);
+  private cErrorLabel errorHargaPaketUbahDataPaket = new cErrorLabel("harga telur tidak boleh kosong!", 25, 295, 550, false);
+  private cCheckBox chAktifUbahDataPaket = new cCheckBox("Add", "1", 25, 316, 100);
   private cBlueButton btnUbahPaketUbahDataPaket = new cBlueButton("Ubah", 25, 348, 110);
   private cRedButton btnBatalUbahDataPaket = new cRedButton("Batal", 155, 348, 110);
-  private cFormLabel labelDeskripsiPaketUbahDataPaket = new cFormLabel("Deskripsi Vitamin", 595, 65, 370, false);
+  private cFormLabel labelDeskripsiPaketUbahDataPaket = new cFormLabel("Deskripsi Telur", 595, 65, 370, false);
   private cTextarea txtDeskripsiPaketUbahDataPaket = new cTextarea(true);
   private cScrollPane spTxtDeskripsiPaketUbahDataPaket = new cScrollPane(txtDeskripsiPaketUbahDataPaket, 595, 90, 370, 205);
-  private cErrorLabel errorDeskripsiPaketUbahDataPaket = new cErrorLabel("deskripsi vitamin tidak boleh kosong!", 595, 295, 370, false);
+  private cErrorLabel errorDeskripsiPaketUbahDataPaket = new cErrorLabel("deskripsi telur tidak boleh kosong!", 595, 295, 370, false);
   
   // RequestSaldo components
   private cLabelInfo labelRequestSaldo = new cLabelInfo("Data Request Request Saldo Pending", 25, 20);
@@ -301,12 +321,12 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     menuBeranda.setSidebarAktif();
     menuTitle.setText("Beranda");
 
-    valueJmlDataMitraBeranda.setText(String.valueOf (Model.getCountMitraTerverifikasi()));
-    valueJmlDataCustomerBeranda.setText( Integer.toString(Model.getCountCustomer()));
-    valueJmlTransaksiPulsaBeranda.setText(String.valueOf(Model.getCountDoneTransaksiPulsa()));
-    valueJmlTransaksiPaketBeranda.setText(String.valueOf(Model.getCountDoneTransaksiPaket()));
-    valueJmlCalonMitraBeranda.setText(String.valueOf(Model.getCountMitraNonVerifikasi()));
-    valueJmlRequestSaldoBeranda.setText(String.valueOf(Model.getCountPendingTransaksiSaldo()));
+    valueJmlDataMitraBeranda.setText( String.valueOf( Model.getCountMitraTerverifikasi() ) );
+    valueJmlDataCustomerBeranda.setText( Integer.toString( Model.getCountCustomer() ) );
+    valueJmlTransaksiPulsaBeranda.setText(String.valueOf( Model.getCountDoneTransaksiPulsa() ));
+    valueJmlTransaksiPaketBeranda.setText(String.valueOf( Model.getCountDoneTransaksiPaket() ));
+    valueJmlCalonMitraBeranda.setText(String.valueOf( Model.getCountMitraNonVerifikasi() ));
+    valueJmlRequestSaldoBeranda.setText( String.valueOf( Model.getCountPendingTransaksiSaldo() ) );
 
     content.add(labelJmlDataMitraBeranda);
     content.add(valueJmlDataMitraBeranda);
@@ -332,7 +352,7 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     refreshContent();
     menuDataMitra.setSidebarAktif();
     menuTitle.setText("Data Mitra");
-    tblDataDataMitra = new cTable(Model.getAllMitra());
+    tblDataDataMitra = new cTable(Model.getAllSaldoMitra());
 
     tblDataDataMitra.getColumnModel().getColumn(0).setMinWidth(0);
     tblDataDataMitra.getColumnModel().getColumn(0).setMaxWidth(0);
@@ -341,8 +361,23 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     tblDataDataMitra.getColumnModel().getColumn(1).setMaxWidth(0);
     tblDataDataMitra.getColumnModel().getColumn(1).setWidth(0);
 
-
     spDataDataMitra = new cScrollPane(tblDataDataMitra, 25, 120, 555, 310);
+
+    txtCariDataMitra.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed ( java.awt.event.ActionEvent ae )
+      {
+        String keyword = txtCariDataMitra.getText();
+        tblDataDataMitra.setModel( Model.getSearchSaldoMitra(keyword) );
+        tblDataDataMitra.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataDataMitra.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataDataMitra.getColumnModel().getColumn(0).setWidth(0);
+        tblDataDataMitra.getColumnModel().getColumn(1).setMinWidth(0);
+        tblDataDataMitra.getColumnModel().getColumn(1).setMaxWidth(0);
+        tblDataDataMitra.getColumnModel().getColumn(1).setWidth(0);
+      }
+    } );
+
     content.add(labelDataMitra);
     content.add(labelCariDataMitra);
     content.add(txtCariDataMitra);
@@ -360,8 +395,9 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     refreshContent();
     menuDataCustomer.setSidebarAktif();
     menuTitle.setText("Data Customer");
-
+    
     tblDataDataCustomer = new cTable(Model.getPulsaKuotaCustomer());
+
     tblDataDataCustomer.getColumnModel().getColumn(0).setMinWidth(0);
     tblDataDataCustomer.getColumnModel().getColumn(0).setMaxWidth(0);
     tblDataDataCustomer.getColumnModel().getColumn(0).setWidth(0);
@@ -370,6 +406,22 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     tblDataDataCustomer.getColumnModel().getColumn(1).setWidth(0);
 
     spDataDataCustomer = new cScrollPane(tblDataDataCustomer, 25, 120, 925, 310);
+
+    txtCariDataCustomer.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        String keyword = txtCariDataCustomer.getText();
+        tblDataDataCustomer.setModel(Model.getSearchPulsaKuotaCustomer(keyword));
+        tblDataDataCustomer.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataDataCustomer.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataDataCustomer.getColumnModel().getColumn(0).setWidth(0);
+        tblDataDataCustomer.getColumnModel().getColumn(1).setMinWidth(0);
+        tblDataDataCustomer.getColumnModel().getColumn(1).setMaxWidth(0);
+        tblDataDataCustomer.getColumnModel().getColumn(1).setWidth(0);
+      }
+    } );
+
     content.add(labelDataCustomer);
     content.add(labelCariDataCustomer);
     content.add(txtCariDataCustomer);
@@ -386,38 +438,54 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     menuDataPaket.setForeground(cColor.WHITE);
     refreshContent();
     menuDataPaket.setSidebarAktif();
-    menuTitle.setText("Data Vitamin");
+    menuTitle.setText("Data Telur");
 
     tblDataDataPaket = new cTable( Model.getAllPaket() );
-    tblDataDataCustomer.getColumnModel().getColumn(0).setMinWidth(0);
-    tblDataDataCustomer.getColumnModel().getColumn(0).setMaxWidth(0);
-    tblDataDataCustomer.getColumnModel().getColumn(0).setWidth(0);
+    tblDataDataPaket.getColumnModel().getColumn(0).setMinWidth(0);
+    tblDataDataPaket.getColumnModel().getColumn(0).setMaxWidth(0);
+    tblDataDataPaket.getColumnModel().getColumn(0).setWidth(0);
 
-    tblDataDataPaket.addMouseListener(new java.awt.event.MouseAdapter(){
+    tblDataDataPaket.addMouseListener( new java.awt.event.MouseAdapter(){
       @Override
-      public void mousePressed(java.awt.event.MouseEvent me)
+      public void mousePressed( java.awt.event.MouseEvent me )
       {
         int selectedIndex = tblDataDataPaket.getSelectedRow();
-        int id_vitamin = Integer.parseInt(tblDataDataPaket.getValueAt(selectedIndex, 0).toString());
+        // int idPaket = Integer.parseInt(tblDataDataPaket.getValueAt(selectedIndex, 0).toString());
+        int idPaket = Integer.valueOf(tblDataDataPaket.getValueAt(selectedIndex, 0).toString());
 
-        System.out.println(id_vitamin);
-
-        String deskripsiPaket = Model.getDetailPaket(id_vitamin)[2].toString();
+        String deskripsiPaket = Model.getDetailPaket(idPaket)[2].toString();
         valueDeskripsiPaketDataPaket.setText(deskripsiPaket);
       }
-    });
-    
+    } );
+
     spDataDataPaket = new cScrollPane(tblDataDataPaket, 25, 145, 555, 250);
+
+    txtCariDataPaket.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        Filter.keyword = txtCariDataPaket.getText();
+
+        tblDataDataPaket.setModel( Filter.search() );
+        tblDataDataPaket.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataDataPaket.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataDataPaket.getColumnModel().getColumn(0).setWidth(0);
+      }
+    } );
+
+    ButtonGroup groupButtonRadio = new ButtonGroup();
+    groupButtonRadio.add(rdSemuaDataPaket);
+    groupButtonRadio.add(rdAktifDataPaket);
+    groupButtonRadio.add(rdTidakAktifDataPaket);
+
     rdSemuaDataPaket.setSelected(true);
-    groupActionDataPaket.add(rdSemuaDataPaket);
-    groupActionDataPaket.add(rdAktifDataPaket);
-    groupActionDataPaket.add(rdTidakAktifDataPaket);
 
     rdSemuaDataPaket.addMouseListener( new java.awt.event.MouseAdapter(){
       @Override
       public void mouseClicked( java.awt.event.MouseEvent me )
       {
-        tblDataDataPaket.setModel(Model.getAllPaket());
+        Filter.filter = "semua";
+        tblDataDataPaket.setModel( Filter.search() );
         tblDataDataPaket.getColumnModel().getColumn(0).setMinWidth(0);
         tblDataDataPaket.getColumnModel().getColumn(0).setMaxWidth(0);
         tblDataDataPaket.getColumnModel().getColumn(0).setWidth(0);
@@ -429,7 +497,8 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
       @Override
       public void mouseClicked( java.awt.event.MouseEvent me )
       {
-        tblDataDataPaket.setModel(Model.getPaketAktif());
+        Filter.filter = "tersedia";
+        tblDataDataPaket.setModel( Filter.search() );
         tblDataDataPaket.getColumnModel().getColumn(0).setMinWidth(0);
         tblDataDataPaket.getColumnModel().getColumn(0).setMaxWidth(0);
         tblDataDataPaket.getColumnModel().getColumn(0).setWidth(0);
@@ -441,7 +510,8 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
       @Override
       public void mouseClicked( java.awt.event.MouseEvent me )
       {
-        tblDataDataPaket.setModel(Model.getPaketNonAktif());
+        Filter.filter = "tidak tersedia";
+        tblDataDataPaket.setModel( Filter.search() );
         tblDataDataPaket.getColumnModel().getColumn(0).setMinWidth(0);
         tblDataDataPaket.getColumnModel().getColumn(0).setMaxWidth(0);
         tblDataDataPaket.getColumnModel().getColumn(0).setWidth(0);
@@ -488,7 +558,15 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     menuDataPaket.setForeground(cColor.WHITE);
     refreshContent();
     menuDataPaket.setSidebarAktif();
-    menuTitle.setText("Tambah Data Vitamin");
+    menuTitle.setText("Tambah Telur");
+
+    // ini adalah cara untuk set text jadi null
+    txtNamaPaketTambahDataPaket.setText(null);
+    txtKuotaPaketTambahDataPaket.setText(null);
+    txtHargaPaketTambahDataPaket.setText(null);
+    txtDeskripsiPaketTambahDataPaket.setText(null);
+    chAktifTambahDataPaket.setSelected(false);
+
     btnBatalTambahDataPaket.addActionListener(new ActionListener(){
       @Override
       public void actionPerformed(java.awt.event.ActionEvent ae)
@@ -496,22 +574,75 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
         initsDataPaket();
       }
     });
+
+    btnTambahPaketTambahDataPaket.addActionListener( new ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        
+        // pengeckan kalau fieldnya kosong
+        if( txtNamaPaketTambahDataPaket.getText().trim().isEmpty() || txtKuotaPaketTambahDataPaket.getText().trim().isEmpty() || txtHargaPaketTambahDataPaket.getText().trim().isEmpty() || txtDeskripsiPaketTambahDataPaket.getText().trim().isEmpty() ){
+
+          dashboardAdminView.this.setVisible(false);
+          
+          // spesifik ke txt nama paket
+          if( txtNamaPaketTambahDataPaket.getText().trim().isEmpty() ){
+            content.add(errorNamaPaketTambahDataPaket);
+          }else{
+            content.remove(errorNamaPaketTambahDataPaket);
+          }
+
+          // spesifik ke kuota
+          if( txtKuotaPaketTambahDataPaket.getText().trim().isEmpty() ) content.add(errorKuotaPaketTambahDataPaket); else content.remove(errorKuotaPaketTambahDataPaket);
+          
+          // spesifik ke Harga
+          if( txtHargaPaketTambahDataPaket.getText().trim().isEmpty() ) content.add(errorHargaPaketTambahDataPaket); else content.remove(errorHargaPaketTambahDataPaket);
+          
+          // spesifik ke Deskripsi
+          if( txtDeskripsiPaketTambahDataPaket.getText().trim().isEmpty() ) content.add(errorDeskripsiPaketTambahDataPaket); else content.remove(errorDeskripsiPaketTambahDataPaket);
+          
+
+          dashboardAdminView.this.setVisible(true);
+          
+        }else{
+          // lakukan insert data
+          String nama = txtNamaPaketTambahDataPaket.getText();
+          int kuota = Integer.valueOf(txtKuotaPaketTambahDataPaket.getText());
+          int harga = Integer.valueOf(txtHargaPaketTambahDataPaket.getText());
+          String deskripsi = txtDeskripsiPaketTambahDataPaket.getText();
+          String statusAktif = chAktifTambahDataPaket.isSelected() ? chAktifTambahDataPaket.getActionCommand() : "0";
+
+          // panggil method tambahDataPaket
+          if( Model.ubahDataPaket(nama, deskripsi, kuota, harga, statusAktif) ){
+            // kalau berhasil
+            JOptionPane.showMessageDialog(dashboardAdminView.this, "Berhasil Update Telur.", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            initsDataPaket();
+          }else{
+            // kalau tidak berhasil
+            JOptionPane.showMessageDialog(dashboardAdminView.this, "Gagal Update Telur.", "Gagal", JOptionPane.ERROR_MESSAGE);
+          }
+
+        }
+
+      }
+    } );
+
     content.add(labelTambahDataPaket);
     content.add(labelNamaPaketTambahDataPaket);
     content.add(txtNamaPaketTambahDataPaket);
-    content.add(errorNamaPaketTambahDataPaket);
+    
     content.add(labelKuotaPaketTambahDataPaket);
     content.add(txtKuotaPaketTambahDataPaket);
-    content.add(errorKuotaPaketTambahDataPaket);
+    
     content.add(labelHargaPaketTambahDataPaket);
     content.add(txtHargaPaketTambahDataPaket);
-    content.add(errorHargaPaketTambahDataPaket);
+    
     content.add(chAktifTambahDataPaket);
     content.add(btnTambahPaketTambahDataPaket);
     content.add(btnBatalTambahDataPaket);
     content.add(labelDeskripsiPaketTambahDataPaket);
     content.add(spTxtDeskripsiPaketTambahDataPaket);
-    content.add(errorDeskripsiPaketTambahDataPaket);
+
     setVisible(true);
   }
   private void initsUbahPaket()
@@ -523,7 +654,7 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     menuDataPaket.setForeground(cColor.WHITE);
     refreshContent();
     menuDataPaket.setSidebarAktif();
-    menuTitle.setText("Ubah Data Vitamin");
+    menuTitle.setText("Ubah Update");
     btnBatalUbahDataPaket.addActionListener(new ActionListener(){
       @Override
       public void actionPerformed(java.awt.event.ActionEvent ae)
@@ -559,13 +690,27 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     refreshContent();
     menuRequestSaldo.setSidebarAktif();
     menuTitle.setText("Request Saldo Pending");
-
+    
     tblDataRequestSaldo = new cTable(Model.getPendingTransaksiSaldo());
     tblDataRequestSaldo.getColumnModel().getColumn(0).setMinWidth(0);
     tblDataRequestSaldo.getColumnModel().getColumn(0).setMaxWidth(0);
     tblDataRequestSaldo.getColumnModel().getColumn(0).setWidth(0);
 
     spDataRequestSaldo = new cScrollPane(tblDataRequestSaldo, 25, 120, 555, 310);
+
+    txtCariRequestSaldo.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        String keyword = txtCariRequestSaldo.getText();
+
+        tblDataRequestSaldo.setModel(Model.getSearchPendingTransaksiSaldo(keyword));
+
+        tblDataRequestSaldo.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataRequestSaldo.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataRequestSaldo.getColumnModel().getColumn(0).setWidth(0);
+      }
+    } );
 
     btnLihatBerhasilRequestSaldo.addActionListener(new ActionListener(){
       @Override
@@ -599,8 +744,20 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     tblDataRequestSaldoDone.getColumnModel().getColumn(0).setMinWidth(0);
     tblDataRequestSaldoDone.getColumnModel().getColumn(0).setMaxWidth(0);
     tblDataRequestSaldoDone.getColumnModel().getColumn(0).setWidth(0);
-    
+
     spDataRequestSaldoDone = new cScrollPane(tblDataRequestSaldoDone, 25, 120, 555, 310);
+
+    txtCariRequestSaldoDone.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        String keyword = txtCariRequestSaldoDone.getText();
+        tblDataRequestSaldoDone.setModel(Model.getSearchDoneTransaksiSaldo(keyword));
+        tblDataRequestSaldoDone.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataRequestSaldoDone.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataRequestSaldoDone.getColumnModel().getColumn(0).setWidth(0);
+      }
+    } );
 
     btnLihatPendingRequestSaldoDone.addActionListener(new ActionListener(){
       @Override
@@ -627,14 +784,27 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     refreshContent();
     menuCalonMitra.setSidebarAktif();
     menuTitle.setText("Calon Mitra");
-   
+    
     tblDataCalonMitra = new cTable(Model.getMitraNonVerifikasi());
     tblDataCalonMitra.getColumnModel().getColumn(0).setMinWidth(0);
     tblDataCalonMitra.getColumnModel().getColumn(0).setMaxWidth(0);
     tblDataCalonMitra.getColumnModel().getColumn(0).setWidth(0);
 
-
     spDataCalonMitra = new cScrollPane(tblDataCalonMitra, 25, 120, 555, 310);
+
+    txtCariCalonMitra.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        String keyword = txtCariCalonMitra.getText();
+
+        tblDataCalonMitra.setModel(Model.getSearchMitraNonVerifikasi(keyword));
+        tblDataCalonMitra.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataCalonMitra.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataCalonMitra.getColumnModel().getColumn(0).setWidth(0);
+      }
+    } );
+
     content.add(labelCalonMitra);
     content.add(labelCariCalonMitra);
     content.add(txtCariCalonMitra);
@@ -652,13 +822,26 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     refreshContent();
     menuTransaksiPulsa.setSidebarAktif();
     menuTitle.setText("Transaksi Telur");
-
+    
     tblDataTransaksiPulsa = new cTable(Model.getAllTransaksiPulsa());
     tblDataTransaksiPulsa.getColumnModel().getColumn(0).setMinWidth(0);
     tblDataTransaksiPulsa.getColumnModel().getColumn(0).setMaxWidth(0);
     tblDataTransaksiPulsa.getColumnModel().getColumn(0).setWidth(0);
 
     spDataTransaksiPulsa = new cScrollPane(tblDataTransaksiPulsa, 25, 120, 930, 310);
+
+    txtCariTransaksiPulsa.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        String keyword = txtCariTransaksiPulsa.getText();
+        tblDataTransaksiPulsa.setModel(Model.getSearchTransaksiPulsa(keyword));
+        tblDataTransaksiPulsa.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataTransaksiPulsa.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataTransaksiPulsa.getColumnModel().getColumn(0).setWidth(0);
+      }
+    } );
+
     content.add(labelTransaksiPulsa);
     content.add(labelCariTransaksiPulsa);
     content.add(txtCariTransaksiPulsa);
@@ -675,13 +858,26 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
     refreshContent();
     menuTransaksiPaket.setSidebarAktif();
     menuTitle.setText("Transaksi Vitamin");
-
+    
     tblDataTransaksiPaket = new cTable(Model.getAllTransaksiPaket());
     tblDataTransaksiPaket.getColumnModel().getColumn(0).setMinWidth(0);
     tblDataTransaksiPaket.getColumnModel().getColumn(0).setMaxWidth(0);
     tblDataTransaksiPaket.getColumnModel().getColumn(0).setWidth(0);
 
     spDataTransaksiPaket = new cScrollPane(tblDataTransaksiPaket, 25, 120, 930, 310);
+
+    txtCariTransaksiPaket.addActionListener( new java.awt.event.ActionListener(){
+      @Override
+      public void actionPerformed( java.awt.event.ActionEvent ae )
+      {
+        String keyword = txtCariTransaksiPaket.getText();
+        tblDataTransaksiPaket.setModel(Model.getSearchTransaksiPaket(keyword));
+        tblDataTransaksiPaket.getColumnModel().getColumn(0).setMinWidth(0);
+        tblDataTransaksiPaket.getColumnModel().getColumn(0).setMaxWidth(0);
+        tblDataTransaksiPaket.getColumnModel().getColumn(0).setWidth(0);
+      }
+    } );
+
     content.add(labelTransaksiPaket);
     content.add(labelCariTransaksiPaket);
     content.add(txtCariTransaksiPaket);
