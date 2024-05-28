@@ -613,7 +613,7 @@ private cBigFont valueJmlRequestSaldoBeranda = new cBigFont("0", 495, 320);
           String statusAktif = chAktifTambahDataPaket.isSelected() ? chAktifTambahDataPaket.getActionCommand() : "0";
 
           // panggil method tambahDataPaket
-          if( Model.ubahDataPaket(nama, deskripsi, kuota, harga, statusAktif) ){
+          if( Model.tambahDataPaket(nama, deskripsi, kuota, harga, statusAktif) ){
             // kalau berhasil
             JOptionPane.showMessageDialog(dashboardAdminView.this, "Berhasil Update Telur.", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
             initsDataPaket();
